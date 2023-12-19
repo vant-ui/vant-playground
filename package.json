@@ -11,10 +11,13 @@
   "dependencies": {
     "@unocss/reset": "^0.58.0",
     "@vue/repl": "^3.0.0",
+    "@vueuse/core": "^10.7.0",
+    "semver": "^7.5.4",
     "vue": "^3.3.11"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",
+    "sass": "^1.69.5",
     "vite": "^5.0.8"
   }
 }
