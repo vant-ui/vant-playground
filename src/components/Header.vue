@@ -91,7 +91,6 @@ const props = defineProps<{
     }>;
   };
   langConfigs: Array<any>;
-  darkModeClass: String;
 }>();
 
 // const langLink = computed(() => `#${this.$route.path.replace(this.lang, this.anotherLang.lang)}`)

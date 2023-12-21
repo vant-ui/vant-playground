@@ -2,6 +2,7 @@
 import {
   File,
   Repl,
+  Preview,
   ReplStore,
   compileFile,
   type Store,
@@ -10,10 +11,11 @@ import {
 } from "@vue/repl";
 import Monaco from "@vue/repl/monaco-editor";
 import Header from "./components/Header.vue";
-import { watchEffect } from "vue";
+import { ref, provide, watchEffect } from "vue";
 import { URLSearchParams } from "url";
-import mainCode from "./template/main.vue?raw";
-import welcomeCode from "./template/welcome.vue?raw";
+import appCode from "./template/App.vue?raw";
+import vantCode from "./template/vant.js?raw";
+// import welcomeCode from "./template/welcome.vue?raw";
 import { shallowRef, reactive } from "vue";
 const defaultMainFile = "src/App.vue";
 
@@ -27,6 +29,9 @@ const genCdnLink = (pkg: string, version: string | undefined, path: string) => {
     // case 'unpkg':
     //   return `https://unpkg.com/${pkg}${version}${path}`
   }
+};
+const genVantCode = () => {
+  return vantCode.replace("#STYLE#", genCdnLink("vant", "", "/lib/index.css"));
 };
 
 const sfcOptions: SFCOptions = {
@@ -59,19 +64,21 @@ const config = {
 };
 const versions = [];
 const langConfigs = [];
-const MAIN_FILE = "src/PlaygroundMain.vue";
+// const MAIN_FILE = "src/PlaygroundMain.vue";
 const APP_FILE = "src/App.vue";
+const VANT_FILE = "src/vant.js";
 
 // const query = new URLSearchParams(location.search)
 const _files = {
-  [APP_FILE]: new File(APP_FILE, welcomeCode),
-  [MAIN_FILE]: new File(MAIN_FILE, mainCode, false),
+  [APP_FILE]: new File(APP_FILE, appCode),
+  [VANT_FILE]: new File(VANT_FILE, genVantCode(), false),
+  // [MAIN_FILE]: new File(MAIN_FILE, mainCode, false),
 };
 console.log("_files", _files);
 
 const compiler = shallowRef<typeof import("vue/compiler-sfc")>();
 const state: StoreState = reactive({
-  mainFile: MAIN_FILE,
+  mainFile: APP_FILE,
   files: _files,
   activeFile: _files[APP_FILE],
   errors: [],
@@ -84,20 +91,20 @@ const state: StoreState = reactive({
 const IMPORT_MAP = "import-map.json";
 const genVueLink = (version: string) => {
   const compilerSfc = genCdnLink(
-    '@vue/compiler-sfc',
+    "@vue/compiler-sfc",
     version,
-    '/dist/compiler-sfc.esm-browser.js'
-  )
+    "/dist/compiler-sfc.esm-browser.js"
+  );
   const runtimeDom = genCdnLink(
-    '@vue/runtime-dom',
+    "@vue/runtime-dom",
     version,
-    '/dist/runtime-dom.esm-browser.js'
-  )
+    "/dist/runtime-dom.esm-browser.js"
+  );
   return {
     compilerSfc,
     runtimeDom,
-  }
-}
+  };
+};
 async function setVueVersion(version: string) {
   const { compilerSfc, runtimeDom } = genVueLink(version);
 
@@ -107,21 +114,21 @@ async function setVueVersion(version: string) {
   // eslint-disable-next-line no-console
   console.info(`[@vue/repl] Now using Vue version: ${version}`);
 }
-// TODO: 目前有一个undefined的报错，需要修复，大概率是左侧编辑器的问题
+// TODO 目前有一个undefined的报错，需要修复，大概率是左侧编辑器的问题
 const store = reactive<Store>({
   state,
   compiler: compiler as any,
   initialShowOutput: false,
   initialOutputMode: "preview",
   init: async () => {
-    await setVueVersion('latest')
-    state.errors = []
+    await setVueVersion("latest");
+    state.errors = [];
     for (const file of Object.values(state.files)) {
-      compileFile(store, file).then((errs) => state.errors.push(...errs))
+      compileFile(store, file).then((errs) => state.errors.push(...errs));
     }
     watchEffect(() =>
       compileFile(store, state.activeFile).then((errs) => (state.errors = errs))
-    )
+    );
   },
   setActive: (filename: string) => {},
   addFile: (filename: string | File) => {},
@@ -137,6 +144,10 @@ const store = reactive<Store>({
       "@vue/shared": {
         version: "",
         path: "/dist/shared.esm-bundler.js",
+      },
+      "vant/lib/index.css": {
+        version: "",
+        path: "",
       },
       vant: {
         version: "",
@@ -163,11 +174,20 @@ const store = reactive<Store>({
         ])
       ),
     };
-    console.log("nemo res", res);
+    console.log("nemo files", res);
     return res;
   },
   customElement: false,
 });
+provide("store", store);
+provide("preview-options", {});
+provide("clear-console", false);
+const previewRef = ref<InstanceType<typeof Preview>>();
+function reload() {
+  previewRef.value?.reload();
+}
+
+defineExpose({ reload });
 // watchEffect(() => history.replaceState({}, "", store.serialize()));
 // store.userOptions.styleSource = `https://preview-${store.pr}-element-plus.surge.sh/bundle/index.css`
 </script>
@@ -175,16 +195,22 @@ const store = reactive<Store>({
 <template>
   <div>
     <Header :config="config" :lang-configs="langConfigs" lang="zh-CN" />
-    <Repl
-      ref="replRef"
-      :store="store"
-      :editor="Monaco"
-      show-compile-output
-      auto-resize
-      :sfc-options="sfcOptions"
-      :clear-console="false"
-      @keydown="handleKeydown"
-    />
+    <div class="van-repl">
+      <div class="van-output">
+        <Preview ref="previewRef" :show="true" :ssr="false" />
+      </div>
+      <Repl
+        ref="replRef"
+        :store="store"
+        :editor="Monaco"
+        :show-compile-output="false"
+        auto-resize
+        :layout-reverse="true"
+        :sfc-options="sfcOptions"
+        :clear-console="false"
+        @keydown="handleKeydown"
+      />
+    </div>
   </div>
 </template>
 
@@ -197,7 +223,34 @@ body {
   --nav-height: 50px;
 }
 
-.vue-repl {
+.van-repl {
   height: calc(100vh - var(--nav-height)) !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+.vue-repl {
+  flex: 1;
+}
+.vue-repl .right {
+  flex: 1;
+}
+.vue-repl .left {
+  display: none;
+}
+.van-output {
+  padding: 10px;
+  box-sizing: border-box;
+  width: 390px;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  .iframe-container {
+    height: calc(100vh - var(--nav-height) - 35px) !important;
+    border: 1px solid #000;
+  }
 }
 </style>
