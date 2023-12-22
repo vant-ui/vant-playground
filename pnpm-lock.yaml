@@ -25,6 +25,9 @@ devDependencies:
   '@vitejs/plugin-vue':
     specifier: ^4.5.2
     version: 4.5.2(vite@5.0.8)(vue@3.3.11)
+  '@vue/tsconfig':
+    specifier: ^0.5.1
+    version: 0.5.1
   sass:
     specifier: ^1.69.5
     version: 1.69.5
@@ -453,6 +456,10 @@ packages:
 
   /@vue/shared@3.3.11:
     resolution: {integrity: sha512-u2G8ZQ9IhMWTMXaWqZycnK4UthG1fA238CD+DP4Dm4WJi5hdUKKLg0RMRaRpDPNMdkTwIDkp7WtD0Rd9BH9fLw==}
+
+  /@vue/tsconfig@0.5.1:
+    resolution: {integrity: sha512-VcZK7MvpjuTPx2w6blwnwZAu5/LgBUtejFOi3pPGQFXQN5Ela03FUtd2Qtg4yWGGissVL0dr6Ro1LfOFh+PCuQ==}
+    dev: true
 
   /@vueuse/core@10.7.0(vue@3.3.11):
     resolution: {integrity: sha512-4EUDESCHtwu44ZWK3Gc/hZUVhVo/ysvdtwocB5vcauSV4B7NiGY5972WnsojB3vRNdxvAt7kzJWE2h9h7C9d5w==}

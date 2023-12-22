@@ -12,9 +12,9 @@ import {
 import Monaco from "@vue/repl/monaco-editor";
 import Header from "./components/Header.vue";
 import { ref, provide, watchEffect } from "vue";
-import { URLSearchParams } from "url";
 import appCode from "./template/App.vue?raw";
 import vantCode from "./template/vant.js?raw";
+import tsconfigCode from './template/tsconfig.json?raw'
 // import welcomeCode from "./template/welcome.vue?raw";
 import { shallowRef, reactive } from "vue";
 const defaultMainFile = "src/App.vue";
@@ -67,14 +67,15 @@ const langConfigs = [];
 // const MAIN_FILE = "src/PlaygroundMain.vue";
 const APP_FILE = "src/App.vue";
 const VANT_FILE = "src/vant.js";
+const TSCONFIG = 'tsconfig.json'
 
 // const query = new URLSearchParams(location.search)
 const _files = {
   [APP_FILE]: new File(APP_FILE, appCode),
   [VANT_FILE]: new File(VANT_FILE, genVantCode(), false),
+  [TSCONFIG]: new File(TSCONFIG, tsconfigCode, false),
   // [MAIN_FILE]: new File(MAIN_FILE, mainCode, false),
 };
-console.log("_files", _files);
 
 const compiler = shallowRef<typeof import("vue/compiler-sfc")>();
 const state: StoreState = reactive({
@@ -177,6 +178,13 @@ const store = reactive<Store>({
     console.log("nemo files", res);
     return res;
   },
+  getTsConfig() {
+    try {
+      return JSON.parse(state.files[TSCONFIG].code)
+    } catch {
+      return {}
+    }
+  },
   customElement: false,
 });
 provide("store", store);
@@ -224,7 +232,7 @@ body {
 }
 
 .van-repl {
-  height: calc(100vh - var(--nav-height)) !important;
+  height: calc(100vh - var(--van-doc-header-top-height)) !important;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -241,16 +249,11 @@ body {
   display: none;
 }
 .van-output {
-  padding: 10px;
-  box-sizing: border-box;
   width: 390px;
-  background-color: #f5f5f5;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  border-right: 1px solid #e5e7eb;
+  height: calc(100vh - var(--van-doc-header-top-height)) !important;
   .iframe-container {
-    height: calc(100vh - var(--nav-height) - 35px) !important;
-    border: 1px solid #000;
+    height: 100%;
   }
 }
 </style>
