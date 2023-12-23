@@ -11,7 +11,7 @@ export function setupVant() {
   installed = true
 }
 
-export function loadStyle() {
+function loadStyle() {
   return new Promise((resolve, reject) => {
     const link = document.createElement('link')
     link.rel = 'stylesheet'

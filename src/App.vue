@@ -14,9 +14,10 @@ import Header from "./components/Header.vue";
 import { ref, provide, watchEffect } from "vue";
 import appCode from "./template/App.vue?raw";
 import vantCode from "./template/vant.js?raw";
-import tsconfigCode from './template/tsconfig.json?raw'
+import tsconfigCode from "./template/tsconfig.json?raw";
 // import welcomeCode from "./template/welcome.vue?raw";
 import { shallowRef, reactive } from "vue";
+import { utoa } from "./utils";
 const defaultMainFile = "src/App.vue";
 
 const genCdnLink = (pkg: string, version: string | undefined, path: string) => {
@@ -67,7 +68,7 @@ const langConfigs = [];
 // const MAIN_FILE = "src/PlaygroundMain.vue";
 const APP_FILE = "src/App.vue";
 const VANT_FILE = "src/vant.js";
-const TSCONFIG = 'tsconfig.json'
+const TSCONFIG = "tsconfig.json";
 
 // const query = new URLSearchParams(location.search)
 const _files = {
@@ -77,14 +78,78 @@ const _files = {
   // [MAIN_FILE]: new File(MAIN_FILE, mainCode, false),
 };
 
+const getImportMap = () => {
+  const deps: Record<string, Dependency> = {
+    vue: {
+      pkg: "@vue/runtime-dom",
+      version: "",
+      path: "/dist/runtime-dom.esm-browser.js",
+    },
+    "vue/server-renderer": {
+      pkg: "@vue/server-renderer",
+      version: "",
+      path: "/dist/server-renderer.esm-browser.js",
+    },
+    "@vue/shared": {
+      version: "",
+      path: "/dist/shared.esm-bundler.js",
+    },
+    "vant/lib/index.css": {
+      version: "",
+      path: "",
+    },
+    vant: {
+      version: "",
+      path: "/es/index.mjs",
+      //     vant: "https://fastly.jsdelivr.net/npm/vant@4.8.1",
+    },
+    "@vant/use": {
+      version: "",
+      path: "/dist/index.esm.mjs",
+      //     "@vant/use": "https://fastly.jsdelivr.net/npm/@vant/use/dist/index.esm.mjs",
+    },
+    "@vant/popperjs": {
+      version: "",
+      path: "/dist/index.esm.mjs",
+      // "https://fastly.jsdelivr.net/npm/@vue/shared/dist/index.esm.mjs",
+    },
+  };
+
+  const res = {
+    imports: Object.fromEntries(
+      Object.entries(deps).map(([key, dep]) => [
+        key,
+        genCdnLink(dep.pkg ?? key, dep.version, dep.path),
+      ])
+    ),
+  };
+  console.log("nemo files", res);
+  return res;
+};
+
+const importMapFile = "import-map.json";
+const _files2 = {
+  [APP_FILE]: appCode,
+  [importMapFile]: JSON.stringify(getImportMap(), null, 2),
+  [VANT_FILE]: genVantCode(),
+  // [VANT_FILE]: genVantCode(),
+  // [TSCONFIG]: tsconfigCode,
+};
+
 const compiler = shallowRef<typeof import("vue/compiler-sfc")>();
+
+const version = "";
+const defaultVueRuntimeURL = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`;
+const defaultVueRuntimeProdURL = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.prod.js`;
+const defaultVueServerRendererURL = `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${version}/dist/server-renderer.esm-browser.js`;
+// const state = new ReplStore();
 const state: StoreState = reactive({
   mainFile: APP_FILE,
   files: _files,
   activeFile: _files[APP_FILE],
   errors: [],
-  vueRuntimeURL: "",
-  vueServerRendererURL: "",
+  vueRuntimeURL: defaultVueRuntimeURL,
+  vueServerRendererURL: defaultVueServerRendererURL,
   typescriptVersion: "latest",
   typescriptLocale: undefined,
   resetFlip: true,
@@ -116,7 +181,11 @@ async function setVueVersion(version: string) {
   console.info(`[@vue/repl] Now using Vue version: ${version}`);
 }
 // TODO 目前有一个undefined的报错，需要修复，大概率是左侧编辑器的问题
-const store = reactive<Store>({
+
+const store = new ReplStore({
+  serializedState: utoa(JSON.stringify(_files2)),
+});
+const store2 = reactive<Store>({
   state,
   compiler: compiler as any,
   initialShowOutput: false,
@@ -141,6 +210,11 @@ const store = reactive<Store>({
         pkg: "@vue/runtime-dom",
         version: "",
         path: "/dist/runtime-dom.esm-browser.js",
+      },
+      "vue/server-renderer": {
+        pkg: "@vue/server-renderer",
+        version: "",
+        path: "/dist/server-renderer.esm-browser.js",
       },
       "@vue/shared": {
         version: "",
@@ -180,9 +254,9 @@ const store = reactive<Store>({
   },
   getTsConfig() {
     try {
-      return JSON.parse(state.files[TSCONFIG].code)
+      return JSON.parse(state.files[TSCONFIG].code);
     } catch {
-      return {}
+      return {};
     }
   },
   customElement: false,
@@ -202,23 +276,17 @@ defineExpose({ reload });
 
 <template>
   <div>
-    <Header :config="config" :lang-configs="langConfigs" lang="zh-CN" />
-    <div class="van-repl">
-      <div class="van-output">
-        <Preview ref="previewRef" :show="true" :ssr="false" />
-      </div>
-      <Repl
-        ref="replRef"
-        :store="store"
-        :editor="Monaco"
-        :show-compile-output="false"
-        auto-resize
-        :layout-reverse="true"
-        :sfc-options="sfcOptions"
-        :clear-console="false"
-        @keydown="handleKeydown"
-      />
-    </div>
+    <Repl
+      ref="replRef"
+      :store="store"
+      :editor="Monaco"
+      :show-compile-output="false"
+      auto-resize
+      :layout-reverse="true"
+      :sfc-options="sfcOptions"
+      :clear-console="false"
+      @keydown="handleKeydown"
+    />
   </div>
 </template>
 
@@ -230,24 +298,10 @@ body {
   --base: #444;
   --nav-height: 50px;
 }
-
-.van-repl {
-  height: calc(100vh - var(--van-doc-header-top-height)) !important;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  box-sizing: border-box;
-}
 .vue-repl {
-  flex: 1;
+  height: 500px;
 }
-.vue-repl .right {
-  flex: 1;
-}
-.vue-repl .left {
-  display: none;
-}
+
 .van-output {
   width: 390px;
   border-right: 1px solid #e5e7eb;

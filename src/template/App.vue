@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { setupVant } from './vant.js'
 
-setupVant()
+setupVant();
+
+const msg = ref("Hello World!");
 </script>
 
 <template>
-  <h1>Have fun! :)</h1>
-  <van-rate icon="like" void-icon="like-o" />
-  <van-button>button</van-button>
+  <h1>{{ msg }}</h1>
+  <input v-model="msg" />
 </template>
