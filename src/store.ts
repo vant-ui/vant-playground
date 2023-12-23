@@ -70,14 +70,15 @@ const getImportMap = () => {
   return res;
 };
 
-const files = {
+const defaultFiles = {
   [WELCOME_FILE]: welcomeCode,
   [IMPORT_MAP_FILE]: JSON.stringify(getImportMap(), null, 2),
   [VANT_FILE]: genVantCode(),
   [TSCONFIG]: tsconfigCode,
 };
+const userFiles = location.hash.slice(1)
 const store = new ReplStore({
-  serializedState: utoa(JSON.stringify(files)),
+  serializedState: userFiles ?? (JSON.stringify(defaultFiles)),
 });
 
 export default store
