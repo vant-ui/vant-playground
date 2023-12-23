@@ -9,5 +9,6 @@ const msg = ref("Hello World!");
 
 <template>
   <h1>{{ msg }}</h1>
-  <input v-model="msg" />
+  <van-field v-model="msg" />
+  <van-button>button</van-button>
 </template>

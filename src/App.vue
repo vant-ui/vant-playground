@@ -275,7 +275,11 @@ defineExpose({ reload });
 </script>
 
 <template>
-  <div>
+  <Header :config="config" :lang-configs="langConfigs" lang="zh-CN" />
+  <div class="van-repl">
+    <div class="van-output">
+      <Preview ref="previewRef" :show="true" :ssr="false" />
+    </div>
     <Repl
       ref="replRef"
       :store="store"
@@ -298,8 +302,22 @@ body {
   --base: #444;
   --nav-height: 50px;
 }
+.van-repl {
+  height: calc(100vh - var(--van-doc-header-top-height)) !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
 .vue-repl {
-  height: 500px;
+  flex: 1;
+}
+.vue-repl .right {
+  flex: 1;
+}
+.vue-repl .left {
+  display: none;
 }
 
 .van-output {
