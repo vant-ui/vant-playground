@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { setupVant } from './vant.js'
+import { setupVant } from './vant'
 
 setupVant();
 

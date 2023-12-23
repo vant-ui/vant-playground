@@ -3,7 +3,7 @@ import { ReplStore } from '@vue/repl'
 import { utoa, genCdnLink } from "./utils";
 
 import welcomeCode from "./template/App.vue?raw";
-import vantCode from "./template/vant.js?raw";
+import vantCode from "./template/vant.ts?raw";
 import tsconfigCode from "./template/tsconfig.json?raw";
 
 interface Dependency {
@@ -13,7 +13,7 @@ interface Dependency {
 }
 
 const WELCOME_FILE = "src/App.vue";
-const VANT_FILE = "src/vant.js";
+const VANT_FILE = "src/vant.ts";
 const TSCONFIG = "tsconfig.json";
 const IMPORT_MAP_FILE = "import-map.json";
 
@@ -66,7 +66,6 @@ const getImportMap = () => {
       ])
     ),
   };
-  console.log("nemo files", res);
   return res;
 };
 
@@ -78,7 +77,7 @@ const defaultFiles = {
 };
 const userFiles = location.hash.slice(1)
 const store = new ReplStore({
-  serializedState: userFiles ?? (JSON.stringify(defaultFiles)),
+  serializedState: !!userFiles ? userFiles : utoa(JSON.stringify(defaultFiles)),
 });
 
 export default store
