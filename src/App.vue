@@ -27,7 +27,7 @@ const config = {
   links: [
     {
       url: "https://github.com/vant-ui/vant-playground",
-      logo: genCdnLink("@vant", "", "github.svg"),
+      logo: genCdnLink("@vant", "", "/assets/github.svg"),
     },
   ],
 };
