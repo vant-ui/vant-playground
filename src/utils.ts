@@ -10,6 +10,18 @@ export function debounce(fn: Function, n = 100) {
   };
 }
 
+export const genCdnLink = (pkg: string, version: string | undefined, path: string) => {
+  version = version ? `@${version}` : "";
+  switch ("jsdelivr") {
+    case "jsdelivr":
+      return `https://cdn.jsdelivr.net/npm/${pkg}${version}${path}`;
+    // case 'jsdelivr-fastly':
+    //   return `https://fastly.jsdelivr.net/npm/${pkg}${version}${path}`
+    // case 'unpkg':
+    //   return `https://unpkg.com/${pkg}${version}${path}`
+  }
+};
+
 export function utoa(data: string): string {
   const buffer = strToU8(data);
   const zipped = zlibSync(buffer, { level: 9 });

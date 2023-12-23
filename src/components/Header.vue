@@ -87,10 +87,10 @@ const props = defineProps<{
     links: Array<{
       url: string;
       logo: string;
-      text: string;
+      text?: string;
     }>;
   };
-  langConfigs: Array<any>;
+  langConfigs: string[];
 }>();
 
 // const langLink = computed(() => `#${this.$route.path.replace(this.lang, this.anotherLang.lang)}`)

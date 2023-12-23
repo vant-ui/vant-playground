@@ -1,39 +1,10 @@
 <script setup lang="ts">
-import {
-  File,
-  Repl,
-  Preview,
-  ReplStore,
-  compileFile,
-  type Store,
-  type SFCOptions,
-  type StoreState,
-} from "@vue/repl";
+import { Repl, Preview, type SFCOptions } from "@vue/repl";
 import Monaco from "@vue/repl/monaco-editor";
 import Header from "./components/Header.vue";
 import { ref, provide, watchEffect } from "vue";
-import appCode from "./template/App.vue?raw";
-import vantCode from "./template/vant.js?raw";
-import tsconfigCode from "./template/tsconfig.json?raw";
-// import welcomeCode from "./template/welcome.vue?raw";
-import { shallowRef, reactive } from "vue";
-import { utoa } from "./utils";
-const defaultMainFile = "src/App.vue";
-
-const genCdnLink = (pkg: string, version: string | undefined, path: string) => {
-  version = version ? `@${version}` : "";
-  switch ("jsdelivr") {
-    case "jsdelivr":
-      return `https://cdn.jsdelivr.net/npm/${pkg}${version}${path}`;
-    // case 'jsdelivr-fastly':
-    //   return `https://fastly.jsdelivr.net/npm/${pkg}${version}${path}`
-    // case 'unpkg':
-    //   return `https://unpkg.com/${pkg}${version}${path}`
-  }
-};
-const genVantCode = () => {
-  return vantCode.replace("#STYLE#", genCdnLink("vant", "", "/lib/index.css"));
-};
+import { genCdnLink } from "./utils";
+import store from "./store";
 
 const sfcOptions: SFCOptions = {
   script: {
@@ -42,225 +13,26 @@ const sfcOptions: SFCOptions = {
   },
 };
 
-const initialUserOptions = {};
-
 const handleKeydown = (evt: KeyboardEvent) => {
   if ((evt.ctrlKey || evt.metaKey) && evt.code === "KeyS") {
     evt.preventDefault();
     return;
   }
 };
-const cdnURL = (path: string) =>
-  `https://fastly.jsdelivr.net/npm/@vant/assets/${path}`;
 
 const config = {
-  logo: cdnURL("logo.png"),
+  logo: genCdnLink("@vant", "", "/assets/logo.png"),
   title: "Vant Playground",
+  subtitle: "",
   links: [
     {
       url: "https://github.com/vant-ui/vant-playground",
-      logo: cdnURL("github.svg"),
+      logo: genCdnLink("@vant", "", "github.svg"),
     },
   ],
 };
-const versions = [];
-const langConfigs = [];
-// const MAIN_FILE = "src/PlaygroundMain.vue";
-const APP_FILE = "src/App.vue";
-const VANT_FILE = "src/vant.js";
-const TSCONFIG = "tsconfig.json";
+const langConfigs: string[] = [];
 
-// const query = new URLSearchParams(location.search)
-const _files = {
-  [APP_FILE]: new File(APP_FILE, appCode),
-  [VANT_FILE]: new File(VANT_FILE, genVantCode(), false),
-  [TSCONFIG]: new File(TSCONFIG, tsconfigCode, false),
-  // [MAIN_FILE]: new File(MAIN_FILE, mainCode, false),
-};
-
-const getImportMap = () => {
-  const deps: Record<string, Dependency> = {
-    vue: {
-      pkg: "@vue/runtime-dom",
-      version: "",
-      path: "/dist/runtime-dom.esm-browser.js",
-    },
-    "vue/server-renderer": {
-      pkg: "@vue/server-renderer",
-      version: "",
-      path: "/dist/server-renderer.esm-browser.js",
-    },
-    "@vue/shared": {
-      version: "",
-      path: "/dist/shared.esm-bundler.js",
-    },
-    "vant/lib/index.css": {
-      version: "",
-      path: "",
-    },
-    vant: {
-      version: "",
-      path: "/es/index.mjs",
-      //     vant: "https://fastly.jsdelivr.net/npm/vant@4.8.1",
-    },
-    "@vant/use": {
-      version: "",
-      path: "/dist/index.esm.mjs",
-      //     "@vant/use": "https://fastly.jsdelivr.net/npm/@vant/use/dist/index.esm.mjs",
-    },
-    "@vant/popperjs": {
-      version: "",
-      path: "/dist/index.esm.mjs",
-      // "https://fastly.jsdelivr.net/npm/@vue/shared/dist/index.esm.mjs",
-    },
-  };
-
-  const res = {
-    imports: Object.fromEntries(
-      Object.entries(deps).map(([key, dep]) => [
-        key,
-        genCdnLink(dep.pkg ?? key, dep.version, dep.path),
-      ])
-    ),
-  };
-  console.log("nemo files", res);
-  return res;
-};
-
-const importMapFile = "import-map.json";
-const _files2 = {
-  [APP_FILE]: appCode,
-  [importMapFile]: JSON.stringify(getImportMap(), null, 2),
-  [VANT_FILE]: genVantCode(),
-  // [VANT_FILE]: genVantCode(),
-  // [TSCONFIG]: tsconfigCode,
-};
-
-const compiler = shallowRef<typeof import("vue/compiler-sfc")>();
-
-const version = "";
-const defaultVueRuntimeURL = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`;
-const defaultVueRuntimeProdURL = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.prod.js`;
-const defaultVueServerRendererURL = `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${version}/dist/server-renderer.esm-browser.js`;
-// const state = new ReplStore();
-const state: StoreState = reactive({
-  mainFile: APP_FILE,
-  files: _files,
-  activeFile: _files[APP_FILE],
-  errors: [],
-  vueRuntimeURL: defaultVueRuntimeURL,
-  vueServerRendererURL: defaultVueServerRendererURL,
-  typescriptVersion: "latest",
-  typescriptLocale: undefined,
-  resetFlip: true,
-});
-const IMPORT_MAP = "import-map.json";
-const genVueLink = (version: string) => {
-  const compilerSfc = genCdnLink(
-    "@vue/compiler-sfc",
-    version,
-    "/dist/compiler-sfc.esm-browser.js"
-  );
-  const runtimeDom = genCdnLink(
-    "@vue/runtime-dom",
-    version,
-    "/dist/runtime-dom.esm-browser.js"
-  );
-  return {
-    compilerSfc,
-    runtimeDom,
-  };
-};
-async function setVueVersion(version: string) {
-  const { compilerSfc, runtimeDom } = genVueLink(version);
-
-  compiler.value = await import(/* @vite-ignore */ compilerSfc);
-  state.vueRuntimeURL = runtimeDom;
-
-  // eslint-disable-next-line no-console
-  console.info(`[@vue/repl] Now using Vue version: ${version}`);
-}
-// TODO 目前有一个undefined的报错，需要修复，大概率是左侧编辑器的问题
-
-const store = new ReplStore({
-  serializedState: utoa(JSON.stringify(_files2)),
-});
-const store2 = reactive<Store>({
-  state,
-  compiler: compiler as any,
-  initialShowOutput: false,
-  initialOutputMode: "preview",
-  init: async () => {
-    await setVueVersion("latest");
-    state.errors = [];
-    for (const file of Object.values(state.files)) {
-      compileFile(store, file).then((errs) => state.errors.push(...errs));
-    }
-    watchEffect(() =>
-      compileFile(store, state.activeFile).then((errs) => (state.errors = errs))
-    );
-  },
-  setActive: (filename: string) => {},
-  addFile: (filename: string | File) => {},
-  deleteFile: (filename: string) => {},
-  renameFile: (oldFilename: string, newFilename: string) => {},
-  getImportMap: () => {
-    const deps: Record<string, Dependency> = {
-      vue: {
-        pkg: "@vue/runtime-dom",
-        version: "",
-        path: "/dist/runtime-dom.esm-browser.js",
-      },
-      "vue/server-renderer": {
-        pkg: "@vue/server-renderer",
-        version: "",
-        path: "/dist/server-renderer.esm-browser.js",
-      },
-      "@vue/shared": {
-        version: "",
-        path: "/dist/shared.esm-bundler.js",
-      },
-      "vant/lib/index.css": {
-        version: "",
-        path: "",
-      },
-      vant: {
-        version: "",
-        path: "/es/index.mjs",
-        //     vant: "https://fastly.jsdelivr.net/npm/vant@4.8.1",
-      },
-      "@vant/use": {
-        version: "",
-        path: "/dist/index.esm.mjs",
-        //     "@vant/use": "https://fastly.jsdelivr.net/npm/@vant/use/dist/index.esm.mjs",
-      },
-      "@vant/popperjs": {
-        version: "",
-        path: "/dist/index.esm.mjs",
-        // "https://fastly.jsdelivr.net/npm/@vue/shared/dist/index.esm.mjs",
-      },
-    };
-
-    const res = {
-      imports: Object.fromEntries(
-        Object.entries(deps).map(([key, dep]) => [
-          key,
-          genCdnLink(dep.pkg ?? key, dep.version, dep.path),
-        ])
-      ),
-    };
-    console.log("nemo files", res);
-    return res;
-  },
-  getTsConfig() {
-    try {
-      return JSON.parse(state.files[TSCONFIG].code);
-    } catch {
-      return {};
-    }
-  },
-  customElement: false,
-});
 provide("store", store);
 provide("preview-options", {});
 provide("clear-console", false);
