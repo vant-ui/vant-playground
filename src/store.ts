@@ -70,13 +70,14 @@ const getImportMap = () => {
   return res;
 };
 
-const _files = {
+const files = {
   [WELCOME_FILE]: welcomeCode,
   [IMPORT_MAP_FILE]: JSON.stringify(getImportMap(), null, 2),
   [VANT_FILE]: genVantCode(),
+  [TSCONFIG]: tsconfigCode,
 };
 const store = new ReplStore({
-  serializedState: utoa(JSON.stringify(_files)),
+  serializedState: utoa(JSON.stringify(files)),
 });
 
 export default store

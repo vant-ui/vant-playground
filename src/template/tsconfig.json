@@ -4,7 +4,11 @@
     "jsx": "preserve",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": ["vant/global.d.ts"],
+    "types": [
+      "vant/index.d.ts",
+      "vant/sfc-shim.d.ts",
+      "vant/tsc-shim.d.ts"
+    ],
     "allowImportingTsExtensions": true,
     "allowJs": true,
     "checkJs": true
