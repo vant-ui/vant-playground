@@ -2,7 +2,8 @@
 import { Repl, Preview, type SFCOptions } from "@vue/repl";
 import Monaco from "@vue/repl/monaco-editor";
 import Header from "./components/Header.vue";
-import { ref, provide, watchEffect } from "vue";
+import { ref, provide, watchEffect, computed } from "vue";
+import { useDark } from "@vueuse/core";
 import { genCdnLink } from "./utils";
 import store from "./store";
 
@@ -32,6 +33,8 @@ const config = {
   ],
 };
 const langConfigs: string[] = [];
+const dark = useDark()
+const theme = computed(() => dark.value ? "dark" : "light")
 
 provide("store", store);
 provide("preview-options", {});
@@ -40,6 +43,7 @@ const previewRef = ref<InstanceType<typeof Preview>>();
 function reload() {
   previewRef.value?.reload();
 }
+
 
 defineExpose({ reload });
 watchEffect(() => history.replaceState({}, "", store.serialize()));
@@ -56,6 +60,7 @@ watchEffect(() => history.replaceState({}, "", store.serialize()));
     <Repl
       ref="replRef"
       :store="store"
+      :theme="theme"
       :editor="Monaco"
       :show-compile-output="false"
       auto-resize

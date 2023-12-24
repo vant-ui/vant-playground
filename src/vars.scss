@@ -26,9 +26,7 @@
   // fonts
   --van-doc-code-font-family: 'Menlo', 'Source Code Pro', 'Monaco',
     'Inconsolata', monospace;
-}
 
-.van-doc-theme-light {
   // text
   --van-doc-text-color-1: var(--van-doc-black);
   --van-doc-text-color-2: var(--van-doc-gray-8);
@@ -53,7 +51,7 @@
   --van-doc-blockquote-background: #ecf9ff;
 }
 
-.van-doc-theme-dark {
+.dark {
   // text
   --van-doc-text-color-1: var(--van-doc-white);
   --van-doc-text-color-2: rgba(255, 255, 255, 0.9);
@@ -65,7 +63,6 @@
   --van-doc-background: #202124;
   --van-doc-background-2: rgba(255, 255, 255, 0.06);
   --van-doc-background-3: rgba(255, 255, 255, 0.1);
-  --van-doc-header-background: rgba(1, 31, 60, 0.3);
   --van-doc-border-color: #3a3a3c;
 
   // code

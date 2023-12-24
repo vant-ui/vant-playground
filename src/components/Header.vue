@@ -7,7 +7,6 @@ import VersionSelect from "./VersionSelect.vue";
 import {
   watch,
   defineProps,
-  toRefs,
   computed,
   reactive,
   ref,
@@ -16,7 +15,7 @@ import {
   inject,
 } from "vue";
 import type { MaybeRef } from "@vueuse/core";
-import { useFetch } from "@vueuse/core";
+import { useDark, useFetch, useToggle } from "@vueuse/core";
 import { genCdnLink } from "@/utils";
 
 interface Version {
@@ -91,12 +90,15 @@ const versions = reactive<Record<string, Version>>({
   },
 });
 
+const dark = useDark();
+const _toggleTheme = useToggle(dark)
+const toggleTheme = () => _toggleTheme()
+
 const packageVersion = "v1.0.0";
 const versionPopState = ref({
   isShow: false,
 });
 const showVersionPop = ref(false);
-const currentTheme = ref("light");
 
 const props = defineProps<{
   lang: String;
@@ -130,46 +132,11 @@ const anotherLang: any = computed(() => {
 const langLabel = computed(() => anotherLang.label);
 
 const themeImg = computed(() => {
-  if (currentTheme.value === "light") {
-    return "https://b.yzcdn.cn/vant/dark-theme.svg";
+  if (dark.value) {
+    return "https://b.yzcdn.cn/vant/light-theme.svg";
   }
-  return "https://b.yzcdn.cn/vant/light-theme.svg";
+  return "https://b.yzcdn.cn/vant/dark-theme.svg";
 });
-
-watch(
-  currentTheme,
-  (newVal, oldVal) => {
-    window.localStorage.setItem("vantTheme", newVal);
-    document.documentElement.classList.remove(`van-doc-theme-${oldVal}`);
-    document.documentElement.classList.add(`van-doc-theme-${newVal}`);
-  },
-  { immediate: true }
-);
-
-const toggleTheme = () => {
-  currentTheme.value = currentTheme.value === "light" ? "dark" : "light";
-};
-const toggleVersionPop = () => {
-  const val = !showVersionPop.value;
-  const action = val ? "add" : "remove";
-  document.body[`${action}EventListener`]("click", checkHideVersionPop);
-  showVersionPop.value = val;
-};
-
-const checkHideVersionPop = (event) => {
-  // if (!this.$refs.version.contains(event.target)) {
-  //       this.showVersionPop = false;
-  //     }
-};
-const onSwitchLang = (lang) => {
-  // this.$router.push(this.$route.path.replace(lang.from, lang.to));
-};
-
-const onSwitchVersion = (version) => {
-  if (version.link) {
-    location.href = version.link;
-  }
-};
 </script>
 
 <template>
