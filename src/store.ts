@@ -44,7 +44,6 @@ const getImportMap = () => {
     vant: {
       version: "",
       path: "/es/index.mjs",
-      //     vant: "https://fastly.jsdelivr.net/npm/vant@4.8.1",
     },
     "@vant/use": {
       version: "",

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // import { packageVersion } from 'site-desktop-shared';
 // import { getDefaultTheme, syncThemeToChild } from '../../common/iframe-sync';
-import { gte } from 'semver'
-import VersionSelect from './VersionSelect.vue';
+import { ReplStore } from "@vue/repl";
+import { gte } from "semver";
+import VersionSelect from "./VersionSelect.vue";
 import {
   watch,
   defineProps,
@@ -12,9 +13,11 @@ import {
   ref,
   unref,
   type Ref,
+  inject,
 } from "vue";
 import type { MaybeRef } from "@vueuse/core";
 import { useFetch } from "@vueuse/core";
+import { genCdnLink } from "@/utils";
 
 interface Version {
   text: string;
@@ -22,8 +25,25 @@ interface Version {
   active: string;
 }
 
-const onChangeVersion = (item) => {
-  console.log("onchangeversion", item);
+const store = inject("store") as ReplStore;
+
+const onChangeVersion = (key: keyof typeof versions, version: string) => {
+  switch (key) {
+    case "vue":
+      store.setVueVersion(version);
+      break;
+    default:
+      const dep = {
+        version: version,
+        path: "/es/index.mjs",
+      };
+
+      const importMap = store.getImportMap();
+      importMap.imports[key] = genCdnLink(key, dep.version, dep.path);
+
+      store.setImportMap(importMap);
+      break;
+  }
 };
 
 const getVersions = (pkg: MaybeRef<string>) => {
@@ -38,20 +58,20 @@ const getVersions = (pkg: MaybeRef<string>) => {
 };
 
 const getSupportedVueVersions = () => {
-  const versions = getVersions('vue')
+  const versions = getVersions("vue");
   return computed(() =>
-    versions.value.filter((version) => gte(version, '3.2.0'))
-  )
-}
+    versions.value.filter((version) => gte(version, "3.2.0"))
+  );
+};
 
 const getSupportedTSVersions = () => {
-  const versions = getVersions('typescript')
+  const versions = getVersions("typescript");
   return computed(() =>
     versions.value.filter(
-      (version) => !version.includes('dev') && !version.includes('insiders')
+      (version) => !version.includes("dev") && !version.includes("insiders")
     )
-  )
-}
+  );
+};
 
 const versions = reactive<Record<string, Version>>({
   vant: {
@@ -127,8 +147,8 @@ watch(
 );
 
 const toggleTheme = () => {
-  currentTheme.value = currentTheme.value === 'light' ? 'dark' : 'light'
-}
+  currentTheme.value = currentTheme.value === "light" ? "dark" : "light";
+};
 const toggleVersionPop = () => {
   const val = !showVersionPop.value;
   const action = val ? "add" : "remove";
@@ -194,7 +214,11 @@ const onSwitchVersion = (version) => {
             :key="key"
             class="van-doc-header__top-nav-item"
           >
-            <VersionSelect @change="onChangeVersion" :label="v.text" :options="v.published" />
+            <VersionSelect
+              @change="(version) => onChangeVersion(key, version)"
+              :label="v.text"
+              :options="v.published"
+            />
           </li>
 
           <li v-if="langLabel && langLink" class="van-doc-header__top-nav-item">

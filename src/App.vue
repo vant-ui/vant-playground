@@ -47,7 +47,8 @@ watchEffect(() => history.replaceState({}, "", store.serialize()));
 </script>
 
 <template>
-  <Header :config="config" :lang-configs="langConfigs" lang="zh-CN" />
+  <Header :config="config" :lang-configs="langConfigs" lang="zh-CN">
+    </Header>
   <div class="van-repl">
     <div class="van-output">
       <Preview ref="previewRef" :show="true" :ssr="false" />

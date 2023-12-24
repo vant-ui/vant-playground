@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, defineProps, type Ref } from "vue";
+import { ref, defineProps, defineEmits, type Ref } from "vue";
+const emit = defineEmits(["change"]);
 const showVersionPop = ref(false);
-const packageVersion = ref("1.0.0");
+const packageVersion = ref("latest");
 defineProps<{
   options: Ref<string[]>;
   label: string;
@@ -9,8 +10,9 @@ defineProps<{
 const toggleVersionPop = () => {
   showVersionPop.value = !showVersionPop.value;
 };
-const onSwitchVersion = (item) => {
-  console.log("nemo", item);
+const onSwitchVersion = (version: string) => {
+  packageVersion.value = version;
+  emit("change", version);
 };
 </script>
 
