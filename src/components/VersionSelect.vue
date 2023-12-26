@@ -26,7 +26,7 @@ const onSwitchVersion = (version: string) => {
       <transition name="van-doc-dropdown">
         <div v-if="showVersionPop" class="van-doc-header__version-pop">
           <div
-            v-for="(item, index) in options"
+            v-for="(item, index) in options.value"
             :key="index"
             class="van-doc-header__version-pop-item"
             @click="onSwitchVersion(item)"

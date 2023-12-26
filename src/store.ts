@@ -2,6 +2,7 @@
 import { File, ReplStore, type StoreOptions, type StoreState } from "@vue/repl";
 import { utoa, genCdnLink } from "./utils";
 
+import welcomeCode2 from "./template/App.vue?raw";
 import welcomeCode from "./template/App.vue?raw";
 import mainCode from "./template/main.vue?raw";
 import vantCode from "./template/vant.ts?raw";

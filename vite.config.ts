@@ -1,6 +1,8 @@
+import fs from "node:fs";
+import path from "node:path";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import path from "node:path";
+import Inspect from 'vite-plugin-inspect'
 const pathSrc = path.resolve(__dirname, "src");
 
 // https://vitejs.dev/config/
@@ -19,7 +21,19 @@ export default defineConfig({
     host: true,
     port: 5173,
   },
-  plugins: [vue()],
+  plugins: [
+    vue({
+      script: {
+        defineModel: true,
+        propsDestructure: true,
+        fs: {
+          fileExists: fs.existsSync,
+          readFile: (file) => fs.readFileSync(file, "utf-8"),
+        },
+      },
+    }),
+    Inspect(),
+  ],
   optimizeDeps: {
     exclude: ["@vue/repl"],
   },
