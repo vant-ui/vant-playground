@@ -1,11 +1,8 @@
 <script setup lang="ts">
-// import { packageVersion } from 'site-desktop-shared';
-// import { getDefaultTheme, syncThemeToChild } from '../../common/iframe-sync';
 import { ReplStore } from "@vue/repl";
 import { gte } from "semver";
 import VersionSelect from "./VersionSelect.vue";
 import {
-  watch,
   defineProps,
   computed,
   reactive,
@@ -13,6 +10,7 @@ import {
   unref,
   type Ref,
   inject,
+  isRef,
 } from "vue";
 import type { MaybeRef } from "@vueuse/core";
 import { useDark, useFetch, useToggle } from "@vueuse/core";
@@ -27,11 +25,12 @@ interface Version {
 const store = inject("store") as ReplStore;
 
 const onChangeVersion = (key: keyof typeof versions, version: string) => {
+  versions[key].active = version;
   switch (key) {
     case "vue":
       store.setVueVersion(version);
       break;
-    default:
+    case "vant":
       const dep = {
         version: version,
         path: "/es/index.mjs",
@@ -39,8 +38,16 @@ const onChangeVersion = (key: keyof typeof versions, version: string) => {
 
       const importMap = store.getImportMap();
       importMap.imports[key] = genCdnLink(key, dep.version, dep.path);
+      importMap.imports["vant/lib/index.css"] = genCdnLink(
+        "vant",
+        version,
+        "/lib/index.css"
+      );
 
       store.setImportMap(importMap);
+      break;
+    case "typescript":
+      store.setTypeScriptVersion(version);
       break;
   }
 };
@@ -91,14 +98,8 @@ const versions = reactive<Record<string, Version>>({
 });
 
 const dark = useDark();
-const _toggleTheme = useToggle(dark)
-const toggleTheme = () => _toggleTheme()
-
-const packageVersion = "v1.0.0";
-const versionPopState = ref({
-  isShow: false,
-});
-const showVersionPop = ref(false);
+const _toggleTheme = useToggle(dark);
+const toggleTheme = () => _toggleTheme();
 
 const props = defineProps<{
   lang: String;
@@ -182,7 +183,8 @@ const themeImg = computed(() => {
             class="van-doc-header__top-nav-item"
           >
             <VersionSelect
-              @change="(version) => onChangeVersion(key, version)"
+              :model-value="v.active"
+              @update:model-value="onChangeVersion(key, $event)"
               :label="v.text"
               :options="v.published"
             />

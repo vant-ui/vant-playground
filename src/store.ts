@@ -52,12 +52,10 @@ const getImportMap = () => {
     "@vant/use": {
       version: "",
       path: "/dist/index.esm.mjs",
-      //     "@vant/use": "https://fastly.jsdelivr.net/npm/@vant/use/dist/index.esm.mjs",
     },
     "@vant/popperjs": {
       version: "",
       path: "/dist/index.esm.mjs",
-      // "https://fastly.jsdelivr.net/npm/@vue/shared/dist/index.esm.mjs",
     },
   };
 

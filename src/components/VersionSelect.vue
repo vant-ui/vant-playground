@@ -1,18 +1,26 @@
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, type Ref } from "vue";
-const emit = defineEmits(["change"]);
+import {
+  ref,
+  defineProps,
+  defineEmits,
+  type Ref,
+  type MaybeRef,
+  watch,
+  toRefs,
+  isRef,
+} from "vue";
+const emit = defineEmits(["update:modelValue"]);
 const showVersionPop = ref(false);
-const packageVersion = ref("latest");
-defineProps<{
+const props = defineProps<{
+  modelValue: string;
   options: Ref<string[]>;
   label: string;
 }>();
 const toggleVersionPop = () => {
   showVersionPop.value = !showVersionPop.value;
 };
-const onSwitchVersion = (version: string) => {
-  packageVersion.value = version;
-  emit("change", version);
+const onSwitchVersion = (version: any) => {
+  emit('update:modelValue', version);
 };
 </script>
 
@@ -22,11 +30,11 @@ const onSwitchVersion = (version: string) => {
       class="van-doc-header__cube van-doc-header__version"
       @click="toggleVersionPop"
     >
-      {{ label }}: {{ packageVersion }}
+      {{ label }}: {{ modelValue || 'latest' }}
       <transition name="van-doc-dropdown">
         <div v-if="showVersionPop" class="van-doc-header__version-pop">
           <div
-            v-for="(item, index) in options.value"
+            v-for="(item, index) in options"
             :key="index"
             class="van-doc-header__version-pop-item"
             @click="onSwitchVersion(item)"
