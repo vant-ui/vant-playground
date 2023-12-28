@@ -1,6 +1,6 @@
 import { zlibSync, unzlibSync, strToU8, strFromU8 } from 'fflate';
 
-export function debounce(fn: Function, n = 100) {
+export function debounce(fn: (...args: any[]) => void, n = 100) {
   let handle: any;
   return (...args: any[]) => {
     if (handle) clearTimeout(handle);

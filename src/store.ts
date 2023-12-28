@@ -1,13 +1,11 @@
 // custom repl's store
-import { File, ReplStore, type StoreOptions, type StoreState } from '@vue/repl';
+import { File, ReplStore, type StoreOptions } from '@vue/repl';
 import { utoa, genCdnLink } from './utils';
 
-import welcomeCode2 from './template/App.vue?raw';
 import welcomeCode from './template/App.vue?raw';
 import mainCode from './template/main.vue?raw';
 import vantCode from './template/vant.ts?raw';
 import tsconfigCode from './template/tsconfig.json?raw';
-import { computed, reactive, shallowRef } from 'vue';
 
 interface Dependency {
   pkg?: string;
@@ -89,6 +87,8 @@ class VantReplStore extends ReplStore {
   }
 }
 const store = new VantReplStore({
-  serializedState: !!userFiles ? userFiles : utoa(JSON.stringify(_files)),
+  serializedState: userFiles
+    ? userFiles
+    : utoa(JSON.stringify(_files)),
 });
 export default store;

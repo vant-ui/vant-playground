@@ -6,12 +6,9 @@ import {
   defineProps,
   computed,
   reactive,
-  ref,
   unref,
   type Ref,
   inject,
-  isRef,
-watch,
 } from "vue";
 import type { MaybeRef } from "@vueuse/core";
 import { useDark, useFetch, useToggle, usePreferredDark } from "@vueuse/core";
@@ -27,18 +24,14 @@ const store = inject("store") as ReplStore;
 
 const onChangeVersion = (key: keyof typeof versions, version: string) => {
   versions[key].active = version;
+  let importMap;
   switch (key) {
     case "vue":
       store.setVueVersion(version);
       break;
     case "vant":
-      const dep = {
-        version: version,
-        path: "/es/index.mjs",
-      };
-
-      const importMap = store.getImportMap();
-      importMap.imports[key] = genCdnLink(key, dep.version, dep.path);
+      importMap = store.getImportMap();
+      importMap.imports[key] = genCdnLink(key, version, '/es/index.mjs');
       importMap.imports["vant/lib/index.css"] = genCdnLink(
         "vant",
         version,
@@ -108,7 +101,7 @@ if (isDark.value !== dark.value) {
 }
 
 const props = defineProps<{
-  lang: String;
+  lang: string;
   config: {
     logo: string;
     title: string;
@@ -136,7 +129,7 @@ const anotherLang: any = computed(() => {
   return {};
 });
 
-const langLabel = computed(() => anotherLang.label);
+const langLabel = computed(() => anotherLang.value.label);
 
 const themeImg = computed(() => {
   if (dark.value) {

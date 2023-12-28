@@ -4,14 +4,10 @@ import {
   defineProps,
   defineEmits,
   type Ref,
-  type MaybeRef,
-  watch,
-  toRefs,
-  isRef,
 } from "vue";
 const emit = defineEmits(["update:modelValue"]);
 const showVersionPop = ref(false);
-const props = defineProps<{
+defineProps<{
   modelValue: string;
   options: Ref<string[]>;
   label: string;
