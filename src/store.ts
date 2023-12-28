@@ -87,8 +87,6 @@ class VantReplStore extends ReplStore {
   }
 }
 const store = new VantReplStore({
-  serializedState: userFiles
-    ? userFiles
-    : utoa(JSON.stringify(_files)),
+  serializedState: userFiles ? userFiles : utoa(JSON.stringify(_files)),
 });
 export default store;

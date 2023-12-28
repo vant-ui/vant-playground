@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "check": "vue-tsc --noEmit",
     "lint": "eslint --cache --max-warnings 0 .",
-    "format-check": "prettier --check --cache \"**/*.[tj]s?(x)\""
+    "format-check": "prettier --check --cache \"**/*.[tj]s?(x)\"",
+    "format": "prettier -w --cache \"**/*.[tj]s?(x)\""
   },
   "dependencies": {
     "@unocss/reset": "^0.58.0",
