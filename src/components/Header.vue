@@ -11,9 +11,10 @@ import {
   type Ref,
   inject,
   isRef,
+watch,
 } from "vue";
 import type { MaybeRef } from "@vueuse/core";
-import { useDark, useFetch, useToggle } from "@vueuse/core";
+import { useDark, useFetch, useToggle, usePreferredDark } from "@vueuse/core";
 import { genCdnLink } from "@/utils";
 
 interface Version {
@@ -98,8 +99,13 @@ const versions = reactive<Record<string, Version>>({
 });
 
 const dark = useDark();
+const isDark = usePreferredDark()
 const _toggleTheme = useToggle(dark);
 const toggleTheme = () => _toggleTheme();
+
+if (isDark.value !== dark.value) {
+  toggleTheme()
+}
 
 const props = defineProps<{
   lang: String;
