@@ -1,20 +1,20 @@
-import fs from "node:fs";
-import path from "node:path";
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import Inspect from 'vite-plugin-inspect'
-const pathSrc = path.resolve(__dirname, "src");
+import fs from 'node:fs';
+import path from 'node:path';
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import Inspect from 'vite-plugin-inspect';
+const pathSrc = path.resolve(__dirname, 'src');
 
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
     alias: {
-      "@": pathSrc,
+      '@': pathSrc,
     },
   },
   build: {
     rollupOptions: {
-      external: ["typescript"],
+      external: ['typescript'],
     },
   },
   server: {
@@ -28,13 +28,13 @@ export default defineConfig({
         propsDestructure: true,
         fs: {
           fileExists: fs.existsSync,
-          readFile: (file) => fs.readFileSync(file, "utf-8"),
+          readFile: (file) => fs.readFileSync(file, 'utf-8'),
         },
       },
     }),
     Inspect(),
   ],
   optimizeDeps: {
-    exclude: ["@vue/repl"],
+    exclude: ['@vue/repl'],
   },
 });
