@@ -86,16 +86,17 @@ body {
   justify-content: flex-start;
   box-sizing: border-box;
 }
+.dark .vue-repl,
 .vue-repl {
   flex: 1;
-}
-.vue-repl .right {
+  --color-branding: var(--van-doc-link-color) !important;
+  .right {
   flex: 1;
-}
-.vue-repl .left {
+  }
+  .left {
   display: none;
+  }
 }
-
 .van-output {
   width: 390px;
   border-right: 1px solid #e5e7eb;
