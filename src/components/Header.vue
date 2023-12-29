@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ReplStore } from "@vue/repl";
-import { gte } from "semver";
-import VersionSelect from "./VersionSelect.vue";
+import { ReplStore } from '@vue/repl';
+import { gte } from 'semver';
+import VersionSelect from './VersionSelect.vue';
+import { defineProps, computed, reactive, unref, type Ref, inject } from 'vue';
+import type { MaybeRef } from '@vueuse/core';
 import {
-  defineProps,
-  computed,
-  reactive,
-  unref,
-  type Ref,
-  inject,
-} from "vue";
-import type { MaybeRef } from "@vueuse/core";
-import { useDark, useFetch, useToggle, usePreferredDark } from "@vueuse/core";
-import { genCdnLink } from "@/utils";
+  useDark,
+  useFetch,
+  useToggle,
+  usePreferredDark,
+  useClipboard,
+} from '@vueuse/core';
+import { showToast } from 'vant';
+import { genCdnLink } from '@/utils';
 
 interface Version {
   text: string;
@@ -20,27 +20,27 @@ interface Version {
   active: string;
 }
 
-const store = inject("store") as ReplStore;
+const store = inject('store') as ReplStore;
 
 const onChangeVersion = (key: keyof typeof versions, version: string) => {
   versions[key].active = version;
   let importMap;
   switch (key) {
-    case "vue":
+    case 'vue':
       store.setVueVersion(version);
       break;
-    case "vant":
+    case 'vant':
       importMap = store.getImportMap();
       importMap.imports[key] = genCdnLink(key, version, '/es/index.mjs');
-      importMap.imports["vant/lib/index.css"] = genCdnLink(
-        "vant",
+      importMap.imports['vant/lib/index.css'] = genCdnLink(
+        'vant',
         version,
-        "/lib/index.css"
+        '/lib/index.css',
       );
 
       store.setImportMap(importMap);
       break;
-    case "typescript":
+    case 'typescript':
       store.setTypeScriptVersion(version);
       break;
   }
@@ -48,7 +48,7 @@ const onChangeVersion = (key: keyof typeof versions, version: string) => {
 
 const getVersions = (pkg: MaybeRef<string>) => {
   const url = computed(
-    () => `https://data.jsdelivr.com/v1/package/npm/${unref(pkg)}`
+    () => `https://data.jsdelivr.com/v1/package/npm/${unref(pkg)}`,
   );
   return useFetch(url, {
     initialData: [],
@@ -58,47 +58,54 @@ const getVersions = (pkg: MaybeRef<string>) => {
 };
 
 const getSupportedVueVersions = () => {
-  const versions = getVersions("vue");
+  const versions = getVersions('vue');
   return computed(() =>
-    versions.value.filter((version) => gte(version, "3.2.0"))
+    versions.value.filter((version) => gte(version, '3.2.0')),
   );
 };
 
 const getSupportedTSVersions = () => {
-  const versions = getVersions("typescript");
+  const versions = getVersions('typescript');
   return computed(() =>
     versions.value.filter(
-      (version) => !version.includes("dev") && !version.includes("insiders")
-    )
+      (version) => !version.includes('dev') && !version.includes('insiders'),
+    ),
   );
 };
 
 const versions = reactive<Record<string, Version>>({
   vant: {
-    text: "Vant",
-    published: getVersions("vant"),
-    active: "",
+    text: 'Vant',
+    published: getVersions('vant'),
+    active: '',
   },
   vue: {
-    text: "Vue",
+    text: 'Vue',
     published: getSupportedVueVersions(),
-    active: "",
+    active: '',
   },
   typescript: {
-    text: "TypeScript",
+    text: 'TypeScript',
     published: getSupportedTSVersions(),
-    active: "",
+    active: '',
   },
 });
 
 const dark = useDark();
-const isDark = usePreferredDark()
+const isDark = usePreferredDark();
 const _toggleTheme = useToggle(dark);
 const toggleTheme = () => _toggleTheme();
 
 if (isDark.value !== dark.value) {
-  toggleTheme()
+  toggleTheme();
 }
+
+const { copy } = useClipboard();
+const onSharePage = () => {
+  copy(location.href)
+    .then(() => showToast('分享链接已复制到剪贴板'))
+    .catch(() => showToast('复制失败，请手动复制链接'));
+};
 
 const props = defineProps<{
   lang: string;
@@ -116,11 +123,11 @@ const props = defineProps<{
 }>();
 
 // const langLink = computed(() => `#${this.$route.path.replace(this.lang, this.anotherLang.lang)}`)
-const langLink = "";
+const langLink = '';
 
 const anotherLang: any = computed(() => {
   const items = props.langConfigs?.filter(
-    (item: any) => item.lang !== props.lang
+    (item: any) => item.lang !== props.lang,
   );
   if (items?.length) {
     return items[0];
@@ -133,9 +140,9 @@ const langLabel = computed(() => anotherLang.value.label);
 
 const themeImg = computed(() => {
   if (dark.value) {
-    return "https://b.yzcdn.cn/vant/light-theme.svg";
+    return 'https://b.yzcdn.cn/vant/light-theme.svg';
   }
-  return "https://b.yzcdn.cn/vant/dark-theme.svg";
+  return 'https://b.yzcdn.cn/vant/dark-theme.svg';
 });
 </script>
 
@@ -165,6 +172,13 @@ const themeImg = computed(() => {
             </a>
           </li>
 
+          <li class="van-doc-header__top-nav-item">
+            <a class="van-doc-header__link" @click="onSharePage">
+              <span>
+                <van-icon name="share" />
+              </span>
+            </a>
+          </li>
           <li class="van-doc-header__top-nav-item">
             <a
               class="van-doc-header__link"
@@ -266,8 +280,14 @@ const themeImg = computed(() => {
     cursor: pointer;
 
     span {
-      color: #fff;
-      font-size: 16px;
+      width: 30px;
+      height: 30px;
+      background-color: #fff;
+      font-size: 22px;
+      border-radius: 30px;
+      display: block;
+      text-align: center;
+      line-height: 30px;
     }
 
     img {

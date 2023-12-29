@@ -6,6 +6,7 @@ import { ref, provide, watchEffect, computed } from "vue";
 import { useDark } from "@vueuse/core";
 import { genCdnLink } from "./utils";
 import store from "./store";
+import 'vant/lib/index.css';
 
 const sfcOptions: SFCOptions = {
   script: {
