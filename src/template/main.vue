@@ -2,7 +2,6 @@
 import App from './App.vue'
 import { setupVant } from "./vant";
 
-console.log('nemo setup ok')
 setupVant();
 </script>
 
