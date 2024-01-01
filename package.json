@@ -11,7 +11,7 @@
     "check": "vue-tsc --noEmit",
     "lint": "eslint --cache --max-warnings 0 .",
     "format-check": "prettier --check --cache \"**/*.[tj]s?(x)\"",
-    "format": "prettier -w --cache \"**/*.[tj]s?(x)\""
+    "format": "prettier -w \"**/*.[tj]s?(x)\""
   },
   "dependencies": {
     "@types/splitpanes": "^2.2.6",
