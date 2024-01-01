@@ -89,4 +89,7 @@ class VantReplStore extends ReplStore {
 const store = new VantReplStore({
   serializedState: userFiles ? userFiles : utoa(JSON.stringify(_files)),
 });
+
+const SHOW_ERROR_KEY = 'repl_show_error'
+localStorage.setItem(SHOW_ERROR_KEY, 'false');
 export default store;

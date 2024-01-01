@@ -49,10 +49,10 @@ function reload() {
 
 defineExpose({ reload });
 watchEffect(() => history.replaceState({}, '', store.serialize()));
-const panelSize = ref(25);
+const panelSize = ref(25)
 const onResizePanel = (event: { size: number }[]) => {
-  panelSize.value = event[0].size;
-};
+  panelSize.value = event[0].size
+}
 const panelConfig = computed(() => {
   return {
     output: {
@@ -65,27 +65,21 @@ const panelConfig = computed(() => {
     },
     console: {
       size: 40,
-    },
-  };
-});
+    }
+  }
+})
 </script>
 
 <template>
   <Header :config="config" :lang-configs="langConfigs" lang="zh-CN"> </Header>
   <div class="van-repl">
     <splitpanes class="default-theme" @resize="onResizePanel">
-      <pane
-        :size="panelConfig.output.size"
-        :min-size="panelConfig.output.minSize"
-      >
+      <pane :size="panelConfig.output.size" :min-size="panelConfig.output.minSize">
         <div class="van-output">
           <Preview ref="previewRef" :show="true" :ssr="false" />
         </div>
       </pane>
-      <pane
-        :size="panelConfig.editor.size"
-        :min-size="panelConfig.editor.minSize"
-      >
+      <pane :size="panelConfig.editor.size" :min-size="panelConfig.editor.minSize">
         <div class="van-editor">
           <Repl
             ref="replRef"
@@ -135,9 +129,11 @@ body {
   --color-branding: var(--van-doc-link-color) !important;
   .right {
     flex: 1;
+    .wrapper {
+      display: none;
+    }
   }
-  .left,
-  .toggler {
+  .left, .toggler {
     display: none;
   }
 }
