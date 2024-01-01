@@ -4,7 +4,6 @@ import Monaco from '@vue/repl/monaco-editor';
 import Header from './components/Header.vue';
 import { ref, provide, watchEffect, computed } from 'vue';
 import { useDark } from '@vueuse/core';
-import { Splitpanes, Pane } from 'splitpanes';
 import { genCdnLink } from './utils';
 import store from './store';
 import 'vant/lib/index.css';
