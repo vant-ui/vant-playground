@@ -49,7 +49,7 @@ function reload() {
 defineExpose({ reload });
 watchEffect(() => history.replaceState({}, '', store.serialize()));
 const panelSize = ref(20)
-const onResizePanel = (event: Pane) => {
+const onResizePanel = (event: { size: number }[]) => {
   panelSize.value = event[0].size
 }
 </script>
@@ -102,11 +102,6 @@ body {
 }
 .van-repl {
   height: calc(100vh - var(--van-doc-header-top-height)) !important;
-  // display: flex;
-  // flex-direction: row;
-  // align-items: center;
-  // justify-content: flex-start;
-  // box-sizing: border-box;
 }
 .dark .vue-repl,
 .vue-repl {
@@ -122,8 +117,6 @@ body {
 }
 .van-output {
   width: 100%;
-  // width: 390px;
-  // border-right: 1px solid #e5e7eb;
   height: 100%;
   .iframe-container {
     height: 100%;
