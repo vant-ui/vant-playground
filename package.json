@@ -20,12 +20,14 @@
     "@vueuse/core": "^10.7.0",
     "fflate": "^0.8.1",
     "semver": "^7.5.4",
+    "splitpanes": "^3.1.5",
     "vant": "^4.8.1",
     "vue": "^3.3.11"
   },
   "devDependencies": {
     "@types/node": "^20.10.5",
     "@types/semver": "^7.5.6",
+    "@types/splitpanes": "^2.2.6",
     "@vant/auto-import-resolver": "^1.0.2",
     "@vant/eslint-config": "^4.0.0",
     "@vitejs/plugin-vue": "^4.5.2",
