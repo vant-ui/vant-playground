@@ -14,13 +14,13 @@
     "format": "prettier -w --cache \"**/*.[tj]s?(x)\""
   },
   "dependencies": {
+    "@types/splitpanes": "^2.2.6",
     "@unocss/reset": "^0.58.0",
     "@vant/icons": "^3.0.2",
     "@vue/repl": "^3.0.0",
     "@vueuse/core": "^10.7.0",
     "fflate": "^0.8.1",
     "semver": "^7.5.4",
-    "@types/splitpanes": "^2.2.6",
     "splitpanes": "^3.1.5",
     "vant": "^4.8.1",
     "vue": "^3.3.11"

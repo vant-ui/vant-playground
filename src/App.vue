@@ -2,6 +2,7 @@
 import { Repl, Preview, type SFCOptions } from '@vue/repl';
 import Monaco from '@vue/repl/monaco-editor';
 import Header from './components/Header.vue';
+import Console from './components/Console.vue';
 import { ref, provide, watchEffect, computed } from 'vue';
 import { useDark } from '@vueuse/core';
 import { Splitpanes, Pane } from 'splitpanes';
@@ -48,22 +49,43 @@ function reload() {
 
 defineExpose({ reload });
 watchEffect(() => history.replaceState({}, '', store.serialize()));
-const panelSize = ref(20)
+const panelSize = ref(25);
 const onResizePanel = (event: { size: number }[]) => {
-  panelSize.value = event[0].size
-}
+  panelSize.value = event[0].size;
+};
+const panelConfig = computed(() => {
+  return {
+    output: {
+      size: panelSize.value,
+      minSize: 20,
+    },
+    editor: {
+      size: 100 - 20 - panelSize.value,
+      minSize: 20,
+    },
+    console: {
+      size: 40,
+    },
+  };
+});
 </script>
 
 <template>
   <Header :config="config" :lang-configs="langConfigs" lang="zh-CN"> </Header>
   <div class="van-repl">
     <splitpanes class="default-theme" @resize="onResizePanel">
-      <pane :size="panelSize" min-size="20">
+      <pane
+        :size="panelConfig.output.size"
+        :min-size="panelConfig.output.minSize"
+      >
         <div class="van-output">
           <Preview ref="previewRef" :show="true" :ssr="false" />
         </div>
       </pane>
-      <pane :size="100 - panelSize" min-size="20">
+      <pane
+        :size="panelConfig.editor.size"
+        :min-size="panelConfig.editor.minSize"
+      >
         <div class="van-editor">
           <Repl
             ref="replRef"
@@ -78,6 +100,9 @@ const onResizePanel = (event: { size: number }[]) => {
             @keydown="handleKeydown"
           />
         </div>
+      </pane>
+      <pane :size="panelConfig.console.size">
+        <Console />
       </pane>
     </splitpanes>
   </div>
@@ -111,7 +136,8 @@ body {
   .right {
     flex: 1;
   }
-  .left, .toggler {
+  .left,
+  .toggler {
     display: none;
   }
 }

@@ -74,8 +74,8 @@ const _files = {
   [TSCONFIG]: tsconfigCode,
 };
 
-const userFiles = location.hash.slice(1);
-// const userFiles = "";
+// const userFiles = location.hash.slice(1);
+const userFiles = '';
 
 class VantReplStore extends ReplStore {
   constructor(storeOptions: StoreOptions = {}) {

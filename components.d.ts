@@ -7,7 +7,9 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    Console: (typeof import('./src/components/Console.vue'))['default'];
     Header: (typeof import('./src/components/Header.vue'))['default'];
+    Message: (typeof import('./src/components/Message.vue'))['default'];
     VanIcon: (typeof import('vant/es'))['Icon'];
     VersionSelect: (typeof import('./src/components/VersionSelect.vue'))['default'];
   }
