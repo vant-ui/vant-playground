@@ -1,0 +1,39 @@
+name: Deploy Site
+
+on:
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'dist/**'
+
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+
+      - name: Build Site
+        run: npm run build:site
+
+      - name: Deploy for GitHub 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        with:
+          branch: main
+          folder: dist
+          token: ${{ secrets.VANT_UI_TOKEN }}
+          repository-name: vant-ui/vant-ui.github.io
+          target-folder: vant-playground
+          # enable single-commit to reduce the repo size
+          single-commit: true
+          clean: true
