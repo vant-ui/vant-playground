@@ -4,6 +4,7 @@ import Monaco from '@vue/repl/monaco-editor';
 import Header from './components/Header.vue';
 import { ref, provide, watchEffect, computed } from 'vue';
 import { useDark } from '@vueuse/core';
+import { Splitpanes, Pane } from 'splitpanes';
 import { genCdnLink } from './utils';
 import store from './store';
 import 'vant/lib/index.css';
@@ -47,26 +48,38 @@ function reload() {
 
 defineExpose({ reload });
 watchEffect(() => history.replaceState({}, '', store.serialize()));
+const panelSize = ref(20)
+const onResizePanel = (event: Pane) => {
+  panelSize.value = event[0].size
+}
 </script>
 
 <template>
   <Header :config="config" :lang-configs="langConfigs" lang="zh-CN"> </Header>
   <div class="van-repl">
-    <div class="van-output">
-      <Preview ref="previewRef" :show="true" :ssr="false" />
-    </div>
-    <Repl
-      ref="replRef"
-      :store="store"
-      :theme="theme"
-      :editor="Monaco"
-      :show-compile-output="false"
-      auto-resize
-      :layout-reverse="true"
-      :sfc-options="sfcOptions"
-      :clear-console="false"
-      @keydown="handleKeydown"
-    />
+    <splitpanes class="default-theme" @resize="onResizePanel">
+      <pane :size="panelSize" min-size="20">
+        <div class="van-output">
+          <Preview ref="previewRef" :show="true" :ssr="false" />
+        </div>
+      </pane>
+      <pane :size="100 - panelSize" min-size="20">
+        <div class="van-editor">
+          <Repl
+            ref="replRef"
+            :store="store"
+            :theme="theme"
+            :editor="Monaco"
+            :show-compile-output="false"
+            auto-resize
+            :layout-reverse="true"
+            :sfc-options="sfcOptions"
+            :clear-console="false"
+            @keydown="handleKeydown"
+          />
+        </div>
+      </pane>
+    </splitpanes>
   </div>
 </template>
 
@@ -78,31 +91,51 @@ body {
   --base: #444;
   --nav-height: 50px;
 }
+.splitpanes__pane {
+  // box-shadow: 0 0 3px rgba(0, 0, 0, .2) inset;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  position: relative;
+  border-right: 1px solid var(--van-doc-border-color);
+  border-left: 1px solid var(--van-doc-border-color);
+}
 .van-repl {
   height: calc(100vh - var(--van-doc-header-top-height)) !important;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  box-sizing: border-box;
+  // display: flex;
+  // flex-direction: row;
+  // align-items: center;
+  // justify-content: flex-start;
+  // box-sizing: border-box;
 }
 .dark .vue-repl,
 .vue-repl {
+  height: 100%;
   flex: 1;
   --color-branding: var(--van-doc-link-color) !important;
   .right {
     flex: 1;
   }
-  .left {
+  .left, .toggler {
     display: none;
   }
 }
 .van-output {
-  width: 390px;
-  border-right: 1px solid #e5e7eb;
-  height: calc(100vh - var(--van-doc-header-top-height)) !important;
+  width: 100%;
+  // width: 390px;
+  // border-right: 1px solid #e5e7eb;
+  height: 100%;
   .iframe-container {
     height: 100%;
   }
+}
+.van-editor {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
 }
 </style>
