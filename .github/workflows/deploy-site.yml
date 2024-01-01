@@ -24,7 +24,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Build Site
-        run: npm run build:site
+        run: pnpm run build
 
       - name: Deploy for GitHub 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1
