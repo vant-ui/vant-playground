@@ -49,37 +49,44 @@ function reload() {
 
 defineExpose({ reload });
 watchEffect(() => history.replaceState({}, '', store.serialize()));
-const panelSize = ref(25)
+const panelSize = ref(25);
 const onResizePanel = (event: { size: number }[]) => {
-  panelSize.value = event[0].size
-}
-const panelConfig = computed(() => {
-  return {
-    output: {
-      size: panelSize.value,
-      minSize: 20,
-    },
-    editor: {
-      size: 100 - 20 - panelSize.value,
-      minSize: 20,
-    },
-    console: {
-      size: 40,
-    }
-  }
-})
+  panelSize.value = event[0].size;
+};
+// const panelConfig = computed(() => {
+//   const eidtorSize = 100 - panelSize.value;
+//   return {
+//     output: {
+//       size: panelSize.value,
+//       minSize: 20,
+//     },
+//     editor: {
+//       size: 100 - 20 - panelSize.value,
+//       minSize: 20,
+//     },
+//     console: {
+//       size: 100 - panelSize.value - 
+//     },
+//   };
+// });
 </script>
 
 <template>
   <Header :config="config" :lang-configs="langConfigs" lang="zh-CN"> </Header>
   <div class="van-repl">
-    <splitpanes class="default-theme" @resize="onResizePanel">
-      <pane :size="panelConfig.output.size" :min-size="panelConfig.output.minSize">
+    <splitpanes class="default-theme">
+      <pane
+        :size="20"
+        :min-size="20"
+      >
         <div class="van-output">
           <Preview ref="previewRef" :show="true" :ssr="false" />
         </div>
       </pane>
-      <pane :size="panelConfig.editor.size" :min-size="panelConfig.editor.minSize">
+      <pane
+        :size="40"
+        :min-size="40"
+      >
         <div class="van-editor">
           <Repl
             ref="replRef"
@@ -95,7 +102,7 @@ const panelConfig = computed(() => {
           />
         </div>
       </pane>
-      <pane :size="panelConfig.console.size">
+      <pane :min-size="20">
         <Console />
       </pane>
     </splitpanes>
@@ -133,7 +140,8 @@ body {
       display: none;
     }
   }
-  .left, .toggler {
+  .left,
+  .toggler {
     display: none;
   }
 }
