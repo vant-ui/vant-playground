@@ -23,6 +23,8 @@ jobs:
           node-version-file: '.node-version'
           cache: 'pnpm'
 
+      - run: pnpm install
+
       - name: Build Site
         run: pnpm run build
 
@@ -33,7 +35,7 @@ jobs:
           folder: dist
           token: ${{ secrets.VANT_UI_TOKEN }}
           repository-name: vant-ui/vant-ui.github.io
-          target-folder: vant-playground
+          target-folder: playground
           # enable single-commit to reduce the repo size
           single-commit: true
           clean: true
