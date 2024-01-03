@@ -34,7 +34,7 @@ jobs:
           branch: main
           folder: dist
           token: ${{ secrets.VANT_PLAYGROUND_TOKEN }}
-          repository-name: vant-ui/vant-playground.github.io
+          repository-name: vant-ui/vant-ui.github.io
           target-folder: playground
           # enable single-commit to reduce the repo size
           single-commit: true
