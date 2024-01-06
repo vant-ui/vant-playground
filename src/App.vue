@@ -55,18 +55,12 @@ watchEffect(() => history.replaceState({}, '', store.serialize()));
   <Header :config="config" :lang-configs="langConfigs" lang="zh-CN"> </Header>
   <div class="van-repl">
     <splitpanes class="default-theme">
-      <pane
-        :size="20"
-        :min-size="20"
-      >
+      <pane :size="20" :min-size="20">
         <div class="van-output">
           <Preview ref="previewRef" :show="true" :ssr="false" />
         </div>
       </pane>
-      <pane
-        :size="40"
-        :min-size="40"
-      >
+      <pane :size="40" :min-size="40">
         <div class="van-editor">
           <Repl
             ref="replRef"

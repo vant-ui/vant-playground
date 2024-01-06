@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ReplStore } from '@vue/repl';
 import { gte } from 'semver';
 import VersionSelect from './VersionSelect.vue';
 import { defineProps, computed, reactive, unref, type Ref, inject } from 'vue';
@@ -13,6 +12,7 @@ import {
 } from '@vueuse/core';
 import { showToast } from 'vant';
 import { genCdnLink } from '@/utils';
+import type { VantReplStore } from '@/store';
 
 interface Version {
   text: string;
@@ -20,7 +20,7 @@ interface Version {
   active: string;
 }
 
-const store = inject('store') as ReplStore;
+const store = inject('store') as VantReplStore;
 
 const onChangeVersion = (key: keyof typeof versions, version: string) => {
   versions[key].active = version;
@@ -73,6 +73,12 @@ const getSupportedTSVersions = () => {
   );
 };
 
+const getVersionActive = (pkg: 'vue') => {
+  switch (pkg) {
+    case 'vue':
+      return store.getVueVersion()
+  }
+};
 const versions = reactive<Record<string, Version>>({
   vant: {
     text: 'Vant',
@@ -82,7 +88,7 @@ const versions = reactive<Record<string, Version>>({
   vue: {
     text: 'Vue',
     published: getSupportedVueVersions(),
-    active: '',
+    active: getVersionActive('vue'),
   },
   typescript: {
     text: 'TypeScript',

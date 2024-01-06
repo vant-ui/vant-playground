@@ -23,40 +23,40 @@ const genVantCode = () => {
   return vantCode.replace('#STYLE#', genCdnLink('vant', '', '/lib/index.css'));
 };
 
-const getImportMap = () => {
-  const deps: Record<string, Dependency> = {
-    vue: {
-      pkg: '@vue/runtime-dom',
-      version: '',
-      path: '/dist/runtime-dom.esm-browser.js',
-    },
-    'vue/server-renderer': {
-      pkg: '@vue/server-renderer',
-      version: '',
-      path: '/dist/server-renderer.esm-browser.js',
-    },
-    '@vue/shared': {
-      version: '',
-      path: '/dist/shared.esm-bundler.js',
-    },
-    'vant/lib/index.css': {
-      version: '',
-      path: '',
-    },
-    vant: {
-      version: '',
-      path: '/es/index.mjs',
-    },
-    '@vant/use': {
-      version: '',
-      path: '/dist/index.esm.mjs',
-    },
-    '@vant/popperjs': {
-      version: '',
-      path: '/dist/index.esm.mjs',
-    },
-  };
+const deps: Record<string, Dependency> = {
+  vue: {
+    pkg: '@vue/runtime-dom',
+    version: '',
+    path: '/dist/runtime-dom.esm-browser.js',
+  },
+  'vue/server-renderer': {
+    pkg: '@vue/server-renderer',
+    version: '',
+    path: '/dist/server-renderer.esm-browser.js',
+  },
+  '@vue/shared': {
+    version: '',
+    path: '/dist/shared.esm-bundler.js',
+  },
+  'vant/lib/index.css': {
+    version: '',
+    path: '',
+  },
+  vant: {
+    version: '',
+    path: '/es/index.mjs',
+  },
+  '@vant/use': {
+    version: '',
+    path: '/dist/index.esm.mjs',
+  },
+  '@vant/popperjs': {
+    version: '',
+    path: '/dist/index.esm.mjs',
+  },
+};
 
+const getImportMap = () => {
   const res = {
     imports: Object.fromEntries(
       Object.entries(deps).map(([key, dep]) => [
@@ -74,16 +74,30 @@ const _files = {
   [TSCONFIG]: tsconfigCode,
 };
 
-// const userFiles = location.hash.slice(1);
-const userFiles = '';
+const userFiles = location.hash.slice(1);
+// const userFiles = '';
 
-class VantReplStore extends ReplStore {
+export class VantReplStore extends ReplStore {
   constructor(storeOptions: StoreOptions = {}) {
     super(storeOptions);
     this.state.mainFile = MAIN_FILE;
     this.addFile(new File(MAIN_FILE, mainCode, true));
     this.addFile(new File(VANT_FILE, genVantCode(), true));
     this.setActive(WELCOME_FILE);
+  }
+  async setVueVersion(version: string) {
+    super.setVueVersion(version);
+    console.log('nemo set vue version', version);
+    this.vueVersion = version;
+  }
+  getVueVersion() {
+    const json = this.getImportMap()
+    console.log(json.imports.vue)
+    // TODO: @vue/repl 初始化阶段就应该提供 getVueVersion，初始化时的 this.vueVersion 是无效的
+    // ! 这种写法后续应该通过获取 this.vueVersion 替代
+    const reg = new RegExp(`.*${deps.vue.pkg}|${deps.vue.path}|@`, 'g')
+    const version = json.imports.vue.replace(reg, '')
+    return version || '';
   }
 }
 const store = new VantReplStore({
