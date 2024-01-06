@@ -49,26 +49,6 @@ function reload() {
 
 defineExpose({ reload });
 watchEffect(() => history.replaceState({}, '', store.serialize()));
-const panelSize = ref(25);
-const onResizePanel = (event: { size: number }[]) => {
-  panelSize.value = event[0].size;
-};
-// const panelConfig = computed(() => {
-//   const eidtorSize = 100 - panelSize.value;
-//   return {
-//     output: {
-//       size: panelSize.value,
-//       minSize: 20,
-//     },
-//     editor: {
-//       size: 100 - 20 - panelSize.value,
-//       minSize: 20,
-//     },
-//     console: {
-//       size: 100 - panelSize.value - 
-//     },
-//   };
-// });
 </script>
 
 <template>
@@ -118,7 +98,6 @@ body {
   --nav-height: 50px;
 }
 .splitpanes__pane {
-  // box-shadow: 0 0 3px rgba(0, 0, 0, .2) inset;
   justify-content: center;
   align-items: center;
   display: flex;
