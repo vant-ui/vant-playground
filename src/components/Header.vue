@@ -61,17 +61,19 @@ const getSupportedVueVersions = () => {
   );
 };
 
-const getVersionActive = (pkg: 'vue') => {
+const getVersionActive = (pkg: 'vue' | 'vant') => {
   switch (pkg) {
     case 'vue':
       return store.getVueVersion();
+    case 'vant':
+      return store.getVantVersion();
   }
 };
 const versions = reactive<Record<string, Version>>({
   vant: {
     text: 'Vant',
     published: getVersions('vant'),
-    active: '',
+    active: getVersionActive('vant'),
   },
   vue: {
     text: 'Vue',

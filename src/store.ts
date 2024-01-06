@@ -35,6 +35,7 @@ const deps: Record<string, Dependency> = {
     path: '/dist/server-renderer.esm-browser.js',
   },
   '@vue/shared': {
+    pkg: '@vue/shared',
     version: '',
     path: '/dist/shared.esm-bundler.js',
   },
@@ -43,14 +44,17 @@ const deps: Record<string, Dependency> = {
     path: '',
   },
   vant: {
+    pkg: 'vant',
     version: '',
     path: '/es/index.mjs',
   },
   '@vant/use': {
+    pkg: '@vant/use',
     version: '',
     path: '/dist/index.esm.mjs',
   },
   '@vant/popperjs': {
+    pkg: '@vant/popperjs',
     version: '',
     path: '/dist/index.esm.mjs',
   },
@@ -85,19 +89,28 @@ export class VantReplStore extends ReplStore {
     this.addFile(new File(VANT_FILE, genVantCode(), true));
     this.setActive(WELCOME_FILE);
   }
+
   async setVueVersion(version: string) {
     super.setVueVersion(version);
     console.log('nemo set vue version', version);
     this.vueVersion = version;
   }
-  getVueVersion() {
+
+  _getVersion(pkg: string) {
     const json = this.getImportMap();
-    console.log(json.imports.vue);
+    const reg = new RegExp(`.*${deps[pkg].pkg}|${deps[pkg].path}|@`, 'g');
+    const version = json.imports[pkg].replace(reg, '');
+    return version || '';
+  }
+
+  getVueVersion() {
     // TODO: @vue/repl 初始化阶段就应该提供 getVueVersion，初始化时的 this.vueVersion 是无效的
     // ! 这种写法后续应该通过获取 this.vueVersion 替代
-    const reg = new RegExp(`.*${deps.vue.pkg}|${deps.vue.path}|@`, 'g');
-    const version = json.imports.vue.replace(reg, '');
-    return version || '';
+    return this._getVersion('vue')
+  }
+
+  getVantVersion() {
+    return this._getVersion('vant');
   }
 }
 const store = new VantReplStore({
