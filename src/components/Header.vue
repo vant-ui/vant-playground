@@ -40,9 +40,6 @@ const onChangeVersion = (key: keyof typeof versions, version: string) => {
 
       store.setImportMap(importMap);
       break;
-    case 'typescript':
-      store.setTypeScriptVersion(version);
-      break;
   }
 };
 
@@ -64,19 +61,10 @@ const getSupportedVueVersions = () => {
   );
 };
 
-const getSupportedTSVersions = () => {
-  const versions = getVersions('typescript');
-  return computed(() =>
-    versions.value.filter(
-      (version) => !version.includes('dev') && !version.includes('insiders'),
-    ),
-  );
-};
-
 const getVersionActive = (pkg: 'vue') => {
   switch (pkg) {
     case 'vue':
-      return store.getVueVersion()
+      return store.getVueVersion();
   }
 };
 const versions = reactive<Record<string, Version>>({
@@ -89,11 +77,6 @@ const versions = reactive<Record<string, Version>>({
     text: 'Vue',
     published: getSupportedVueVersions(),
     active: getVersionActive('vue'),
-  },
-  typescript: {
-    text: 'TypeScript',
-    published: getSupportedTSVersions(),
-    active: '',
   },
 });
 
