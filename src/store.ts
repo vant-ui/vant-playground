@@ -106,7 +106,7 @@ export class VantReplStore extends ReplStore {
   getVueVersion() {
     // TODO: @vue/repl 初始化阶段就应该提供 getVueVersion，初始化时的 this.vueVersion 是无效的
     // ! 这种写法后续应该通过获取 this.vueVersion 替代
-    return this._getVersion('vue')
+    return this._getVersion('vue');
   }
 
   getVantVersion() {
